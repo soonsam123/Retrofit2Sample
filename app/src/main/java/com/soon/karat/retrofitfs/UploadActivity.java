@@ -13,22 +13,25 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.soon.karat.retrofitfs.api.LocalHostService;
+import com.soon.karat.retrofitfs.api.UserService;
 import com.soon.karat.retrofitfs.utils.FileUtils;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
-import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.Request;
+import okhttp3.OkHttpClient;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
@@ -41,14 +44,14 @@ public class UploadActivity extends MenuAppCompatActivity {
     private static final int GALLERY_REQUEST_CODE = 7;
     private static final int WRITE_EXTERNAL_REQUEST_CODE = 10;
 
-    private Toolbar mToolbar;
-
     private TextInputEditText mDescription;
-    private AppCompatButton mPickPhoto;
+    private TextInputEditText mLocation;
+    private TextInputEditText mPhotographer;
+    private TextInputEditText mYear;
     private TextView mFileName;
-    private AppCompatButton mUpload;
 
     private Uri photoUri;
+    private String realPath;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -57,7 +60,7 @@ public class UploadActivity extends MenuAppCompatActivity {
         if (requestCode == WRITE_EXTERNAL_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0]
                     == PackageManager.PERMISSION_GRANTED) {
-                openActionPick(Environment.DIRECTORY_PICTURES, "image/*", GALLERY_REQUEST_CODE);
+                FileUtils.openActionPick(this, Environment.DIRECTORY_PICTURES, "image/*", GALLERY_REQUEST_CODE, false);
             }
         }
 
@@ -71,8 +74,21 @@ public class UploadActivity extends MenuAppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Uri uri = data.getData();
                 if (uri != null) {
-                    mFileName.setText(uri.getPath());
+
                     photoUri = uri;
+
+                    /*if (Build.VERSION.SDK_INT < 19) {
+                        realPath = FileUtils.getRealPathFromURI_API11to18(this, uri);
+                    } else { // KIT KAT or greater
+                        realPath = FileUtils.getRealPathFromURI_API19(this, uri);
+                    }*/
+
+                    realPath = FileUtils.getRealPathFromURI(this, uri);
+
+                    String text = "Path: " + uri.getPath()
+                            + " - RealPath: " + realPath;
+                    mFileName.setText(text);
+
                 }
             }
         }
@@ -84,23 +100,28 @@ public class UploadActivity extends MenuAppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload);
 
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getString(R.string.upload_upload));
         }
 
         mDescription = findViewById(R.id.edit_text_description);
-        mPickPhoto = findViewById(R.id.button_select_file);
+        mLocation = findViewById(R.id.edit_text_location);
+        mPhotographer = findViewById(R.id.edit_text_photographer);
+        mYear = findViewById(R.id.edit_text_year);
+
         mFileName = findViewById(R.id.text_file_name);
-        mUpload = findViewById(R.id.button_upload);
+
+        AppCompatButton mPickPhoto = findViewById(R.id.button_select_file);
+        AppCompatButton mUpload = findViewById(R.id.button_upload);
 
         mPickPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (ContextCompat.checkSelfPermission(UploadActivity.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
-                    openActionPick(Environment.DIRECTORY_PICTURES, "image/*", GALLERY_REQUEST_CODE);
+                    FileUtils.openActionPick(UploadActivity.this, Environment.DIRECTORY_PICTURES, "image/*", GALLERY_REQUEST_CODE, false);
                 } else {
                     ActivityCompat.requestPermissions(UploadActivity.this,
                             new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -114,32 +135,72 @@ public class UploadActivity extends MenuAppCompatActivity {
             public void onClick(View v) {
                 if (photoUri != null) {
 
-                    String description = mDescription.getText().toString();
+                    // -----------------------------------------------------------------
+                    //                          Logging OkHttp
+                    // -----------------------------------------------------------------
+                    OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+                    HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
+                    interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+                    if (BuildConfig.DEBUG) {
+                        okHttpClientBuilder.addInterceptor(interceptor);
+                    }
 
-                    RequestBody descriptionPart = RequestBody.create(MultipartBody.FORM, description);
 
-                    File originalFile = FileUtils.getFile(UploadActivity.this, photoUri);
+                    // -----------------------------------------------------------------
+                    //                         Create the PartMap
+                    // -----------------------------------------------------------------
+                    // 1. Create the Parts for the Strings
+                    RequestBody descriptionPart = createPartFromString(mDescription.getText().toString());
+                    RequestBody locationPart = createPartFromString(mLocation.getText().toString());
+                    RequestBody photographerPart = createPartFromString(mPhotographer.getText().toString());
+                    RequestBody yearPart = createPartFromString(mYear.getText().toString());
 
-                    RequestBody filePart = RequestBody.create(
-                            MediaType.parse(getContentResolver().getType(photoUri)),
-                            originalFile);
+                    // 2. Create multi part for the Uri
+                    MultipartBody.Part file = prepareFilePart("photo", photoUri);
 
-                    MultipartBody.Part file = MultipartBody.Part.createFormData("photo", originalFile.getName(), filePart);
+                    // 3. Create the map
+                    Map<String, RequestBody> partMap = new HashMap<>();
+                    partMap.put("client", createPartFromString("android")); // Add some default values
+                    partMap.put("secret", createPartFromString("hunter2"));
 
+                    if (!TextUtils.isEmpty(mDescription.getText().toString())) { // Just add non-empty values
+                        partMap.put("description", descriptionPart);
+                    }
+
+                    if (!TextUtils.isEmpty(mLocation.getText().toString())) {
+                        partMap.put("location", locationPart);
+                    }
+
+                    if (!TextUtils.isEmpty(mPhotographer.getText().toString())) {
+                        partMap.put("photographer", photographerPart);
+                    }
+
+                    if (!TextUtils.isEmpty(mYear.getText().toString())) {
+                        partMap.put("year", yearPart);
+                    }
+
+                    // -----------------------------------------------------------------
+                    //                          Retrofit Call
+                    // -----------------------------------------------------------------
                     Retrofit retrofit = new Retrofit.Builder()
-                            .baseUrl(LocalHostService.BASE_URL)
+                            .baseUrl(UserService.BASE_URL)
                             .addConverterFactory(GsonConverterFactory.create())
+                            .client(okHttpClientBuilder.build())
                             .build();
 
-                    LocalHostService service = retrofit.create(LocalHostService.class);
-                    service.uploadPhoto(descriptionPart, file).enqueue(new Callback<ResponseBody>() {
+                    UserService service = retrofit.create(UserService.class);
+                    service.uploadPhoto(partMap, file).enqueue(new Callback<ResponseBody>() {
                         @Override
-                        public void onResponse(retrofit2.Call<ResponseBody> call, Response<ResponseBody> response) {
-                            Toast.makeText(UploadActivity.this, "Surprisingly worked", Toast.LENGTH_SHORT).show();
+                        public void onResponse(@NonNull retrofit2.Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
+                            if (response.isSuccessful()) {
+                                Toast.makeText(UploadActivity.this, "Surprisingly worked", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Log.i(TAG, "onResponse: Error code: " + response.code() + " - error message: " + response.message());
+                            }
                         }
 
                         @Override
-                        public void onFailure(retrofit2.Call<ResponseBody> call, Throwable t) {
+                        public void onFailure(@NonNull retrofit2.Call<ResponseBody> call, @NonNull Throwable t) {
                             t.printStackTrace();
                             Log.i(TAG, "onFailure: Error message: " + t.getMessage());
                         }
@@ -153,17 +214,22 @@ public class UploadActivity extends MenuAppCompatActivity {
 
     }
 
-    private void openActionPick(String directory, String fileType, int requestCode) {
-        Intent pickerIntent = new Intent(Intent.ACTION_PICK);
+    @NonNull
+    private RequestBody createPartFromString(String string) {
+        return RequestBody.create(MultipartBody.FORM, string);
+    }
 
-        File file = Environment.getExternalStoragePublicDirectory(directory);
-        String directoryPath = file.getPath();
+    @NonNull
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
 
-        Uri data = Uri.parse(directoryPath);
+        File file = new File(FileUtils.getRealPathFromURI(this, fileUri));
 
-        pickerIntent.setDataAndType(data, fileType);
+        RequestBody requestBody = RequestBody.create(
+                MediaType.parse(getContentResolver().getType(fileUri))
+                , file);
 
-        startActivityForResult(pickerIntent, requestCode);
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestBody);
+
     }
 
 }

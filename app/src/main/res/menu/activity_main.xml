@@ -11,6 +11,10 @@
 
     <item
         android:id="@+id/menu_upload"
-        android:title="@string/upload_upload" />
+        android:title="@string/upload_upload_a_photo" />
+
+    <item
+        android:id="@+id/menu_upload_album"
+        android:title="@string/upload_upload_a_album" />
 
 </menu>

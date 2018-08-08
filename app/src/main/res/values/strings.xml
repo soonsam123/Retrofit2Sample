@@ -6,8 +6,16 @@
     <string name="registration_topics">Topics</string>
     <string name="registration_age">Age</string>
     <string name="registration_register">Registrar</string>
+
     <string name="menu_repositories">Repositories</string>
+
     <string name="upload_description">Description</string>
     <string name="upload_upload">Upload</string>
     <string name="upload_pick_a_photo">Pick a photo</string>
+    <string name="upload_location">Location</string>
+    <string name="upload_photographer">Photographer</string>
+    <string name="upload_year">Year</string>
+    <string name="upload_upload_a_photo">Upload a photo</string>
+    <string name="upload_upload_a_album">Upload a album</string>
+    <string name="upload_pick_multiple_photos">Pick multiple photos</string>
 </resources>

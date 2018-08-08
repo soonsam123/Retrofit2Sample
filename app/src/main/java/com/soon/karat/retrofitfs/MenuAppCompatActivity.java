@@ -34,6 +34,10 @@ public class MenuAppCompatActivity extends AppCompatActivity {
                 Intent uploadActivityIntent = new Intent(this, UploadActivity.class);
                 startActivity(uploadActivityIntent);
                 break;
+            case R.id.menu_upload_album:
+                Intent uploadAlbumActivityIntent = new Intent(this, UploadAlbumActivity.class);
+                startActivity(uploadAlbumActivityIntent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

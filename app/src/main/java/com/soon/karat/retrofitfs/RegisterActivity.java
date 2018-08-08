@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.soon.karat.retrofitfs.api.LocalHostService;
+import com.soon.karat.retrofitfs.api.UserService;
 import com.soon.karat.retrofitfs.models.User;
 
 import okhttp3.OkHttpClient;
@@ -83,12 +83,12 @@ public class RegisterActivity extends MenuAppCompatActivity {
         }
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(LocalHostService.BASE_URL)
+                .baseUrl(UserService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClientBuilder.build()) // Add the client here.
                 .build();
 
-        LocalHostService service = retrofit.create(LocalHostService.class);
+        UserService service = retrofit.create(UserService.class);
 
         service.createAccount(user).enqueue(new Callback<User>() {
             @Override
