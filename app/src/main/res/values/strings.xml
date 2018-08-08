@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">RetrofitFS</string>
+
+    <string name="registration_name">Name</string>
+    <string name="registration_email">Email</string>
+    <string name="registration_topics">Topics</string>
+    <string name="registration_age">Age</string>
+    <string name="registration_register">Registrar</string>
+    <string name="menu_repositories">Repositories</string>
+    <string name="upload_description">Description</string>
+    <string name="upload_upload">Upload</string>
+    <string name="upload_pick_a_photo">Pick a photo</string>
+</resources>
