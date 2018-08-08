@@ -22,6 +22,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".UploadAlbumActivity" />
+
+        <service android:name=".backgroundthread.BackgroundService" />
     </application>
 
 </manifest>

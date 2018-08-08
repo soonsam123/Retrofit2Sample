@@ -20,8 +20,17 @@ public interface UserService {
     String BASE_URL = "http://10.0.2.2:3000/"; // Use this ip when working in emulator
     /*String BASE_URL = "http://10.200.3.172:3000";*/ // Use your Computer's local ip address when working in a real device
 
+    // Uncomment this to add STATIC headers
+    /*@Headers({
+            "Cache-Control: max-age=3600",
+            "User-Agent: Android"
+    })*/
     @POST("users")
     Call<User> createAccount(@Body User user);
+
+    // For DYNAMIC headers add this inside the method createAccount(HERE!)
+    /*@Header("Cache-Control") String cache*/
+
 
     /**
      * Send a single Part with an image.

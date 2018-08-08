@@ -1,5 +1,6 @@
 package com.soon.karat.retrofitfs;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.soon.karat.retrofitfs.api.UserService;
+import com.soon.karat.retrofitfs.backgroundthread.BackgroundService;
 import com.soon.karat.retrofitfs.models.User;
 
 import okhttp3.OkHttpClient;
@@ -25,21 +27,17 @@ public class RegisterActivity extends MenuAppCompatActivity {
 
     private static final String TAG = "RegisterActivity";
 
-    private Toolbar mToolbar;
-
     private TextInputEditText mName;
     private TextInputEditText mEmail;
     private TextInputEditText mAge;
     private TextInputEditText mTopics;
-
-    private AppCompatButton mRegisterAccount;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mToolbar = findViewById(R.id.toolbar);
+        Toolbar mToolbar = findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getString(R.string.registration_register));
@@ -50,7 +48,7 @@ public class RegisterActivity extends MenuAppCompatActivity {
         mAge = findViewById(R.id.edit_text_age);
         mTopics = findViewById(R.id.edit_text_topics);
 
-        mRegisterAccount = findViewById(R.id.button_register);
+        AppCompatButton mRegisterAccount = findViewById(R.id.button_register);
 
         mRegisterAccount.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +72,9 @@ public class RegisterActivity extends MenuAppCompatActivity {
         // it is easy to debug. However, it could print sensitive data to the logs.
         // That's why we activate this only while in development mode.
 
-        // Create OkHttp client
+        // ----------------------------------------------------------------
+        //                            Logging
+        // ----------------------------------------------------------------
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
@@ -82,6 +82,11 @@ public class RegisterActivity extends MenuAppCompatActivity {
             okHttpClientBuilder.addInterceptor(logging);
         }
 
+        // ----------------------------------------------------------------
+        //                    Create and call Retrofit
+        // ----------------------------------------------------------------
+
+        // Asynchronous on the UI thread
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(UserService.BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -89,7 +94,6 @@ public class RegisterActivity extends MenuAppCompatActivity {
                 .build();
 
         UserService service = retrofit.create(UserService.class);
-
         service.createAccount(user).enqueue(new Callback<User>() {
             @Override
             public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
@@ -109,6 +113,11 @@ public class RegisterActivity extends MenuAppCompatActivity {
                 Log.i(TAG, "onFailure: Error message: " + t.getMessage());
             }
         });
+
+        // Synchronous in a background thread
+        // Uncomment lines below to use
+        /*Intent intent = new Intent(RegisterActivity.this, BackgroundService.class);
+        startService(intent);*/
 
     }
 }

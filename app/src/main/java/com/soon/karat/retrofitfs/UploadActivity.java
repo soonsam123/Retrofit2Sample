@@ -37,6 +37,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * This Activity allows you to upload a single photo with
+ * multiple Parts: as description, location, photographer, year.
+ * The photo is stored as {@link MultipartBody.Part} and the other fields
+ * are Strings that are send to Retrofit as {@link RequestBody}.
+ * </p>
+ * You can use this activity also as inspiration if you want
+ * to upload other kind of files as videos, documents or audios.
+ */
 public class UploadActivity extends MenuAppCompatActivity {
 
     private static final String TAG = "UploadActivity";
