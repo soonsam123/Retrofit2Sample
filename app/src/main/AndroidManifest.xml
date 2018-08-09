@@ -22,6 +22,8 @@
         <activity android:name=".RegisterActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".UploadAlbumActivity" />
+        <activity android:name=".DownloadActivity" />
+        <activity android:name=".SearchActivity" />
 
         <service android:name=".backgroundthread.BackgroundService" />
     </application>

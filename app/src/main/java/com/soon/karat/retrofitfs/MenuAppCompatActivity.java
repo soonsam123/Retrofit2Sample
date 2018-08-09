@@ -38,6 +38,14 @@ public class MenuAppCompatActivity extends AppCompatActivity {
                 Intent uploadAlbumActivityIntent = new Intent(this, UploadAlbumActivity.class);
                 startActivity(uploadAlbumActivityIntent);
                 break;
+            case R.id.menu_download:
+                Intent profileActivityIntent = new Intent(this, DownloadActivity.class);
+                startActivity(profileActivityIntent);
+                break;
+            case R.id.menu_search:
+                Intent searchActivityIntent = new Intent(this, SearchActivity.class);
+                startActivity(searchActivityIntent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

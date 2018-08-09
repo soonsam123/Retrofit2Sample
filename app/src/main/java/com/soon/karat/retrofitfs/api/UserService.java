@@ -10,17 +10,21 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import retrofit2.http.Url;
 
 public interface UserService {
 
     String BASE_URL = "http://10.0.2.2:3000/"; // Use this ip when working in emulator
     /*String BASE_URL = "http://10.200.3.172:3000";*/ // Use your Computer's local ip address when working in a real device
 
-    // Uncomment this to add STATIC headers
+    // H1. Uncomment this to add STATIC headers
     /*@Headers({
             "Cache-Control: max-age=3600",
             "User-Agent: Android"
@@ -28,9 +32,10 @@ public interface UserService {
     @POST("users")
     Call<User> createAccount(@Body User user);
 
-    // For DYNAMIC headers add this inside the method createAccount(HERE!)
+    // H2. For DYNAMIC headers add this inside the method createAccount(HERE!)
     /*@Header("Cache-Control") String cache*/
 
+    // H3. For request headers in OkHttp Interceptor see RegisterActivity.
 
     /**
      * Send a single Part with an image.
@@ -65,8 +70,9 @@ public interface UserService {
 
     /**
      * Send multiples files with a description.
+     *
      * @param description album's description
-     * @param files the multiple files
+     * @param files       the multiple files
      * @return a response body
      */
     @Multipart
@@ -74,6 +80,12 @@ public interface UserService {
     Call<ResponseBody> uploadAlbum(
             @Part("description") RequestBody description,
             @Part List<MultipartBody.Part> files
-            );
+    );
+
+    @GET("users/{id}")
+    Call<User> getUserById(@Path("id") String id);
+
+    @GET("users")
+    Call<List<User>> getUserByName(@Query("name") String name);
 
 }

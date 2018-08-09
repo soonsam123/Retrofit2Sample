@@ -15,7 +15,11 @@ import com.soon.karat.retrofitfs.api.UserService;
 import com.soon.karat.retrofitfs.backgroundthread.BackgroundService;
 import com.soon.karat.retrofitfs.models.User;
 
+import java.io.IOException;
+
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -68,13 +72,35 @@ public class RegisterActivity extends MenuAppCompatActivity {
 
     private void sendNetworkRequest(User user) {
 
-        // This process will print the data the server is receiving in the logs so
-        // it is easy to debug. However, it could print sensitive data to the logs.
-        // That's why we activate this only while in development mode.
+        // ----------------------------------------------------------------
+        //                             Headers
+        // ----------------------------------------------------------------
+        // Request Headers in OkHttp Interceptor
+        // Uncomment the lines below if you want to send headers dynamically
+        // over several endpoints. NOTE: If you uncomment these lines, you
+        // need to comment the Logging section.
+
+        /*OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
+        okHttpClientBuilder.addInterceptor(new Interceptor() {
+            @Override
+            public okhttp3.Response intercept(Chain chain) throws IOException {
+
+                Request request = chain.request();
+
+                Request.Builder newRequest = request.newBuilder().header("Authorization", "secret-key");
+                // OBS: newBuilder().header() replace the existing header if there is a equal one.
+                //      newBuilder().addHeader() adds a new header even thought there is a equal one.
+
+                return chain.proceed(newRequest.build());
+            }
+        });*/
 
         // ----------------------------------------------------------------
         //                            Logging
         // ----------------------------------------------------------------
+        // This process will print the data the server is receiving in the logs so
+        // it is easy to debug. However, it could print sensitive data to the logs.
+        // That's why we activate this only while in development mode.
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);

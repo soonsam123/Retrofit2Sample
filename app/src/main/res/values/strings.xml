@@ -8,6 +8,7 @@
     <string name="registration_register">Registrar</string>
 
     <string name="menu_repositories">Repositories</string>
+    <string name="menu_profile">Profile</string>
 
     <string name="upload_description">Description</string>
     <string name="upload_upload">Upload</string>
@@ -18,4 +19,15 @@
     <string name="upload_upload_a_photo">Upload a photo</string>
     <string name="upload_upload_a_album">Upload a album</string>
     <string name="upload_pick_multiple_photos">Pick multiple photos</string>
+
+    <string name="download_download_a_file">Download a File</string>
+    <string name="download_info_about_where_the_file_will_be">The files will be located in your Downloads folder.</string>
+    <string name="download_failed">Failed to download the file</string>
+    <string name="download_download">Download</string>
+    <string name="download_download_small_file">Download a small file</string>
+    <string name="download_download_big_file">Download a big file</string>
+    <string name="search_user_id">User ID</string>
+    <string name="search_search">Search</string>
+    <string name="search_search_for_user_id">Search for user ID</string>
+    <string name="search_search_for_user_name">Search for user name</string>
 </resources>

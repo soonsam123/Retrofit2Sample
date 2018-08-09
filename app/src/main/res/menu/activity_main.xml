@@ -17,4 +17,12 @@
         android:id="@+id/menu_upload_album"
         android:title="@string/upload_upload_a_album" />
 
+    <item
+        android:id="@+id/menu_download"
+        android:title="@string/download_download" />
+
+    <item
+        android:id="@+id/menu_search"
+        android:title="@string/search_search" />
+
 </menu>
