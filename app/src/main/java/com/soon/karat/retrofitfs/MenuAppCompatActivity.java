@@ -46,6 +46,14 @@ public class MenuAppCompatActivity extends AppCompatActivity {
                 Intent searchActivityIntent = new Intent(this, SearchActivity.class);
                 startActivity(searchActivityIntent);
                 break;
+            case R.id.menu_feedback:
+                Intent feedbackActivityIntent = new Intent(this, FeedbackActivity.class);
+                startActivity(feedbackActivityIntent);
+                break;
+            case R.id.menu_message:
+                Intent messageActivityIntent = new Intent(this, MessageActivity.class);
+                startActivity(messageActivityIntent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }

@@ -24,6 +24,8 @@
         <activity android:name=".UploadAlbumActivity" />
         <activity android:name=".DownloadActivity" />
         <activity android:name=".SearchActivity" />
+        <activity android:name=".FeedbackActivity" />
+        <activity android:name=".MessageActivity" />
 
         <service android:name=".backgroundthread.BackgroundService" />
     </application>

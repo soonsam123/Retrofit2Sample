@@ -25,4 +25,12 @@
         android:id="@+id/menu_search"
         android:title="@string/search_search" />
 
+    <item
+        android:id="@+id/menu_feedback"
+        android:title="@string/feedback" />
+
+    <item
+        android:id="@+id/menu_message"
+        android:title="@string/message" />
+
 </menu>

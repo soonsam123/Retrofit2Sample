@@ -3,6 +3,7 @@ package com.soon.karat.retrofitfs.utils;
 import android.util.Log;
 
 import com.soon.karat.retrofitfs.api.ServiceGenerator;
+import com.soon.karat.retrofitfs.api.ServiceGeneratorGitHub;
 import com.soon.karat.retrofitfs.models.APIError;
 
 import java.io.IOException;
@@ -15,7 +16,7 @@ import retrofit2.Response;
 public class ErrorUtils {
 
     public static APIError parseError(Response<?> response) {
-        Converter<ResponseBody, APIError> converter = ServiceGenerator.retrofit()
+        Converter<ResponseBody, APIError> converter = ServiceGeneratorGitHub.retrofit()
                 .responseBodyConverter(APIError.class, new Annotation[0]);
 
         APIError error;
