@@ -33,4 +33,8 @@
         android:id="@+id/menu_message"
         android:title="@string/message" />
 
+    <item
+        android:id="@+id/menu_sign_in_github"
+        android:title="@string/github_oauth" />
+
 </menu>

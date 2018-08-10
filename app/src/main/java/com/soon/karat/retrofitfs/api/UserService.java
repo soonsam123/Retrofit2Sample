@@ -17,6 +17,7 @@ import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import retrofit2.http.QueryMap;
 import retrofit2.http.Url;
 
 public interface UserService {
@@ -87,5 +88,4 @@ public interface UserService {
 
     @GET("users")
     Call<List<User>> getUserByName(@Query("name") String name);
-
 }

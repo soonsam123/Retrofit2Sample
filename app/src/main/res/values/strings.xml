@@ -33,4 +33,13 @@
     <string name="send">Send</string>
     <string name="feedback">Feedback</string>
     <string name="message">Message</string>
+    <string name="github_sign_in">Sign in with Github</string>
+    <string name="github_oauth">Github OAuth</string>
+    <string name="profile_followers">Followers</string>
+    <string name="profile_following">Following</string>
+    <string name="fake_name">Fake Name</string>
+    <string name="fake_company">Fake Company</string>
+    <string name="fake_number_304">304</string>
+    <string name="fake_number_37">37</string>
+    <string name="fake_bio">This is my fake bio</string>
 </resources>

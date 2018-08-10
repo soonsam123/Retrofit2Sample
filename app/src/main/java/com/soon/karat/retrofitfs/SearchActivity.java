@@ -21,6 +21,13 @@ import com.soon.karat.retrofitfs.models.GithubUser;
 import com.soon.karat.retrofitfs.models.User;
 import com.soon.karat.retrofitfs.utils.ErrorUtils;
 
+import java.io.IOException;
+
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +69,10 @@ public class SearchActivity extends MenuAppCompatActivity {
 
     private void getUserByName(String name) {
 
+        // ----------------------------------------------------------------
+        //               Search for Github Users by its name
+        // ----------------------------------------------------------------
+        // The purpose of this code is to show how to handle errors properly.
         GithubService service = ServiceGeneratorGitHub.createService(GithubService.class);
 
         service.getUserByName(name).enqueue(new Callback<GithubUser>() {
@@ -138,5 +149,62 @@ public class SearchActivity extends MenuAppCompatActivity {
             }
         });
         snackbar.show();
+    }
+
+    /**
+     * This method teaches you how to add a specif query parameter to
+     * every request by adding it to the {@link OkHttpClient}.
+     * The method is correct, but I did not implemented it in this Activity,
+     * I just let this as a demo.
+     * You should finish the logic by collecting the parameters to make it
+     * work.
+     * @param id the id of the user.
+     * @param order the order the results will be shown.
+     * @param page the number of the page that will be shown.
+     */
+    private void searchForUsers(Integer id, String order, Integer page) {
+        // ----------------------------------------------------------------
+        //               Add Query Parameters to Every Request
+        // ----------------------------------------------------------------
+        // This allows you to send a query parameters to every request
+        // using okHttpClient.
+        // Uncomment the lines below if you want to see it in action.
+        final String apiKey = "super-secret";
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request original = chain.request();
+                        HttpUrl httpUrl = original.url();
+
+                        HttpUrl newHttpUrl = httpUrl.newBuilder().addQueryParameter("apikey", apiKey).build();
+
+                        Request.Builder requestBuilder = original.newBuilder().url(newHttpUrl);
+
+                        Request request = requestBuilder.build();
+                        return chain.proceed(request);
+                    }
+                })
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(GithubService.BASE_URL)
+                .client(okHttpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        GithubService service = retrofit.create(GithubService.class);
+        service.searchForUsers(id, order, page).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                // todo do something with the values
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                // todo handle failures
+            }
+        });
     }
 }

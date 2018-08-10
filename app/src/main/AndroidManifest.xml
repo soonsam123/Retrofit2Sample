@@ -19,6 +19,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".RegisterActivity" />
         <activity android:name=".UploadActivity" />
         <activity android:name=".UploadAlbumActivity" />
@@ -26,6 +27,19 @@
         <activity android:name=".SearchActivity" />
         <activity android:name=".FeedbackActivity" />
         <activity android:name=".MessageActivity" />
+
+        <activity android:name=".GitAuthenticationActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="callback"
+                    android:scheme="test" />
+            </intent-filter>
+        </activity>
 
         <service android:name=".backgroundthread.BackgroundService" />
     </application>

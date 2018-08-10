@@ -54,6 +54,10 @@ public class MenuAppCompatActivity extends AppCompatActivity {
                 Intent messageActivityIntent = new Intent(this, MessageActivity.class);
                 startActivity(messageActivityIntent);
                 break;
+            case R.id.menu_sign_in_github:
+                Intent gitAuthenticationActivityIntent = new Intent(this, GitAuthenticationActivity.class);
+                startActivity(gitAuthenticationActivityIntent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
