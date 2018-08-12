@@ -1,13 +1,20 @@
 package com.soon.karat.retrofitfs;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProvider;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.soon.karat.retrofitfs.api.GithubService;
 import com.soon.karat.retrofitfs.models.GitHubRepo;
+import com.soon.karat.retrofitfs.ui.ReposViewModel;
 import com.soon.karat.retrofitfs.ui.UserReposAdapter;
 
 import java.util.List;
@@ -29,6 +36,8 @@ public class MainActivity extends MenuAppCompatActivity {
     private Toolbar mToolbar;
     private RecyclerView mRecyclerView;
 
+    private ProgressBar mProgressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,39 +45,30 @@ public class MainActivity extends MenuAppCompatActivity {
 
         mToolbar = findViewById(R.id.toolbar);
         mRecyclerView = findViewById(R.id.recycler_view);
+        mProgressBar = findViewById(R.id.progress_bar);
+
+        mRecyclerView.setVisibility(View.INVISIBLE);
 
         setSupportActionBar(mToolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setTitle(getString(R.string.menu_repositories));
         }
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(GithubService.BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
 
-        GithubService service = retrofit.create(GithubService.class);
-
-        service.getUserRepos("soonsam123").enqueue(new Callback<List<GitHubRepo>>() {
+        ReposViewModel model = ViewModelProviders.of(this).get(ReposViewModel.class);
+        model.getRepos().observe(this, new Observer<List<GitHubRepo>>() {
             @Override
-            public void onResponse(Call<List<GitHubRepo>> call, Response<List<GitHubRepo>> response) {
-                if (response.isSuccessful()) {
-                    List<GitHubRepo> repositories = response.body();
-                    setupRecyclerView(repositories);
-                } else {
-                    Log.i(TAG, "onResponse: ERROR - body: " + response.body() + " - Code: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<GitHubRepo>> call, Throwable t) {
-                t.printStackTrace();
-                Log.i(TAG, "onFailure: Error Message" + t.getMessage());
+            public void onChanged(@Nullable List<GitHubRepo> gitHubRepos) {
+                setupRecyclerView(gitHubRepos);
             }
         });
+
     }
 
     private void setupRecyclerView(List<GitHubRepo> repositories) {
+        mProgressBar.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(linearLayoutManager);
         mRecyclerView.setAdapter(new UserReposAdapter(repositories));
